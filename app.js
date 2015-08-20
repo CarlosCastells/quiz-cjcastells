@@ -40,6 +40,25 @@ app.use(function(req, res, next) {
   next();
 });
 
+// Implementa proceso de auto logout despues de 2 min
+app.use(function(req,res,next)
+{   
+     if(!req.session.user)
+     {req.session.tiempo_conexion = new Date().getTime();
+      console.log('Tiempo inicial de conexion', req.session.tiempo_conexion)}
+     else
+      {
+        if ((new Date().getTime()-req.session.tiempo_conexion) > 120000)   
+           { delete req.session.user;
+             res.redirect("/login");
+             console.log('tiempo desconexion', 
+                        (new Date().getTime()-req.session.tiempo_conexion))  }
+        else {req.session.tiempo_conexion = new Date().getTime();
+              console.log('tiempo conectado', req.session.tiempo_conexion) }
+       }
+      next();
+});
+
 app.use('/', routes);
 
 // catch 404 and forward to error handler
